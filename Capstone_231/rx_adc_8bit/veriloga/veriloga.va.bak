@@ -1,0 +1,80 @@
+// Created Thu Aug  3 13:48:42 2023
+
+`include "constants.vams"
+`include "disciplines.vams"
+
+
+//--------------------
+// -  Ideal 8 bit analog to digital converter
+//
+// vin:		[V,A]
+// vd[7:0]:	data output terminals	[V,A]
+//
+// INSTANCE parameters
+//    vlogic_high = [V]
+//    vlogic_low  = [V]
+//    vrange      = input analog voltage range [V]
+//
+// MODEL parameters
+//    {none}
+//
+// This model is ideal in the sense that there is no mismatch modeled.
+//
+`define NUM_ADC_BITS	8
+
+module rx_adc_8bit(VD, VDB, VIN, VDD, VSS);
+
+input	VIN;
+input 	VDD, VSS;
+output	[`NUM_ADC_BITS-1:0] VD;
+output	[`NUM_ADC_BITS-1:0] VDB;
+electrical	VIN;
+electrical 	VDD, VSS;
+electrical	[`NUM_ADC_BITS-1:0] VD;
+electrical	[`NUM_ADC_BITS-1:0] VDB;
+
+parameter integer bit_num = 8;
+   real vrange;
+   real vlogic_high;
+   real vlogic_low;
+   real unconverted;
+   real halfref;
+
+   real vtmp[`NUM_ADC_BITS-1:0];
+   real vtmpb[`NUM_ADC_BITS-1:0];
+   integer i;
+
+   analog begin
+	  vlogic_high = V(VDD);
+	  vlogic_low  = V(VSS);
+      vrange      = (2^bit_num-1)*vlogic_high;
+      @ ( initial_step ) begin
+          halfref = vrange / 2;
+      end
+
+      unconverted = V(VIN);
+      for (i = (`NUM_ADC_BITS-1); i >= 0 ; i = i - 1) begin
+            vtmp[i] = vlogic_low;
+            vtmpb[i] = vlogic_high;
+            if (unconverted > halfref) begin
+               vtmp[i] = vlogic_high; 
+               vtmpb[i] = vlogic_low; 
+               unconverted = unconverted - halfref;
+	    end else begin
+               vtmp[i] = vlogic_low;
+               vtmpb[i] = vlogic_high; 
+	    end
+            unconverted = unconverted * 2;
+      end
+
+      //
+      // assign the outputs
+      //
+      generate i(`NUM_ADC_BITS-1,0) begin
+         V(VD[i]) <+ vtmp[i];
+         V(VDB[i]) <+ vtmpb[i];
+      end
+   end
+`undef NUM_ADC_BITS
+endmodule
+

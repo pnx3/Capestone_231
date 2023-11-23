@@ -1,0 +1,5 @@
+TDMCHECKPOINT="1.0"
+Capstone_231/schematic_dp.Cat type="category"
+Capstone_231/testbench_dp.Cat type="category"
+Capstone_231/testbench_tp.Cat type="category"
+keepEmptyCategory type="unknown"

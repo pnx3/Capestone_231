@@ -1,0 +1,8 @@
+TDMCHECKPOINT="1.0"
+Capstone_231/bitper_skew.Cat type="category"
+Capstone_231/clock_preamp.Cat type="category"
+Capstone_231/data_preamp.Cat type="category"
+Capstone_231/data_sampler.Cat type="category"
+Capstone_231/rx_iref type="cell"
+Capstone_231/rx_preamp_top type="cell"
+keepEmptyCategory type="unknown"
